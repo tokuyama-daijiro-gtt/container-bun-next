@@ -5,7 +5,11 @@ WORKDIR /workspace
 
 FROM mcr.microsoft.com/devcontainers/base:debian AS development
 COPY --from=base /usr/local/bin/bun /usr/local/bin/bun
-RUN ln -s /usr/local/bin/bun /usr/local/bin/bunx
+RUN ln -sf /usr/local/bin/bun /usr/local/bin/bunx \
+    && ln -sf /usr/local/bin/bun /usr/bin/bun \
+    && ln -sf /usr/local/bin/bun /usr/bin/bunx \
+    && /usr/bin/bun --version
+ENV PATH="/usr/local/bin:/usr/bin:${PATH}"
 WORKDIR /workspace
 CMD ["sleep", "infinity"]
 
