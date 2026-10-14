@@ -1,0 +1,17 @@
+{
+  "name": "Next.js + Hono (Bun)",
+  "build": {
+    "dockerfile": "../../Dockerfile",
+    "context": "../..",
+    "target": "development"
+  },
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "mounts": [
+    "source=container-bun-next-node-modules,target=/workspace/node_modules,type=volume",
+    "source=container-bun-next-web-node-modules,target=/workspace/apps/web/node_modules,type=volume",
+    "source=container-bun-next-api-node-modules,target=/workspace/apps/api/node_modules,type=volume"
+  ],
+  "forwardPorts": [3000],
+  "postCreateCommand": "bun install --frozen-lockfile"
+}

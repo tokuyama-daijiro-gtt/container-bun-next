@@ -1,35 +1,29 @@
 {
-  "name": "app",
-  "version": "0.1.0",
+  "name": "container-bun-next",
   "private": true,
+  "workspaces": ["apps/*"],
   "scripts": {
-    "dev": "bun --bun next dev --hostname 0.0.0.0",
-    "build": "bun --bun next build",
-    "start": "bun --bun next start",
-    "lint": "eslint"
+    "dev": "bun run --filter '@repo/*' dev",
+    "build": "bun run --filter @repo/api build && bun run --filter @repo/web build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --project packages/shared/tsconfig.json && bun run --filter '@repo/*' typecheck",
+    "check": "biome check .",
+    "format": "biome check --write ."
   },
   "dependencies": {
-    "next": "16.4.0",
-    "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "zod": "4.6.7"
   },
   "devDependencies": {
-    "@tailwindcss/turbopack": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.4.0",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "@biomejs/biome": "2.5.15",
+    "@testing-library/jest-dom": "6.10.0",
+    "@testing-library/react": "16.3.3",
+    "@types/node": "20.19.43",
+    "jsdom": "26.1.0",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
   },
   "packageManager": "bun@1.4.3",
-  "ignoreScripts": [
-    "sharp",
-    "unrs-resolver"
-  ],
-  "trustedDependencies": [
-    "sharp",
-    "unrs-resolver"
-  ]
+  "ignoreScripts": ["sharp", "unrs-resolver"],
+  "trustedDependencies": ["sharp", "unrs-resolver"]
 }

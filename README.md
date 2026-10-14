@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js + Hono Bun monorepo
 
-## Getting Started
+Bun WorkspacesでNext.js、Hono、共有Zod契約を管理するモノレポです。ブラウザからHono APIへ直接アクセスする経路は持たず、Next.jsのServer Actionだけが内部APIを呼び出します。
 
-First, run the development server:
+## Structure
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```text
+apps/web/          Next.js App Router
+apps/api/          Hono API
+packages/shared/   Zod request/response contracts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`package.json`はルートと各アプリにだけ配置しています。共有依存、Biome、TypeScript、Vitestはルートで管理し、アプリ固有の依存は各アプリで管理します。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+VS CodeのDev Containersから、通常は`Next.js + Hono (Bun)`を選択します。Zscalerが必要な環境だけ`Next.js + Hono (Bun + Zscaler)`を選択し、ホストの`~/.certs/zscaler.crt`を用意してください。依存関係はDev Container内の名前付きvolumeにインストールされます。
 
-## Learn More
+```bash
+bun run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Webは <http://localhost:3000> で起動します。APIは同じコンテナの`127.0.0.1:3001`だけで待ち受け、ホストにはforwardしません。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Checks
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+bun run check
+bun run typecheck
+bun run test
+bun run build
+```
 
-## Deploy on Vercel
+テストランナーにはVitestを使用しています。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Production image
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+docker build --target production -t container-bun-next .
+docker run --rm -p 3000:3000 container-bun-next
+```
+
+本番イメージはNext.js standalone、バンドル済みHono API、2プロセスを監視する小さな起動スクリプトだけを含みます。公開ポートは3000だけです。
+
+Zscalerが必要なビルド環境では、証明書をBuildKit secretとして一時的に渡せます。証明書はイメージにコピーされません。
+
+```bash
+docker build --target production \
+  --secret id=zscaler_cert,src="$HOME/.certs/zscaler.crt" \
+  -t container-bun-next .
+```

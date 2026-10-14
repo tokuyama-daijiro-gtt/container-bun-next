@@ -1,13 +1,16 @@
-
 {
-  "name": "Next.js + Bun",
+  "name": "Next.js + Hono (Bun + Zscaler)",
   "build": {
-    "dockerfile": "Dockerfile",
-    "context": ".."
+    "dockerfile": "../../Dockerfile",
+    "context": "../..",
+    "target": "development"
   },
   "workspaceFolder": "/workspace",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
   "mounts": [
+    "source=container-bun-next-node-modules,target=/workspace/node_modules,type=volume",
+    "source=container-bun-next-web-node-modules,target=/workspace/apps/web/node_modules,type=volume",
+    "source=container-bun-next-api-node-modules,target=/workspace/apps/api/node_modules,type=volume",
     "source=${localEnv:HOME}/.certs/zscaler.crt,target=/certs/zscaler.crt,type=bind,readonly"
   ],
   "containerEnv": {
